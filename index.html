@@ -2,15 +2,14 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Three.js Object Display</title>
+  <title>Three.js Point Cloud Display</title>
   <style>
     body { margin: 0; }
   </style>
 </head>
 <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.153.0/three.min.js" integrity="sha512-5ajBhKbDcvRgu2/sCvkhXAQPg6/BnfN/0te1osh0kixzCujtrosB4rmcMfqArTqyAtRpVApQbhgAxTNG26+1Bw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/loaders/OBJLoader.min.js"></script> -->
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.153.0/three.min.js" integrity="sha512-5ajBhKbDcvRgu2/sCvkhXAQPg6/BnfN/0te1osh0kixzCujtrosB4rmcMfqArTqyAtRpVApQbhgAxTNG26+1Bw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script>
     // Create a scene
     const scene = new THREE.Scene();
@@ -24,34 +23,58 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // Create an OBJ loader
-    const loader = new THREE.ObjectLoader();
-
-    // Load the OBJ file
+    // Load the .pcd file
+    const loader = new THREE.FileLoader();
     loader.load(
-      'bugatti.obj',
-      function (object) {
-        // Scale and position the object
-        object.scale.set(0.5, 0.5, 0.5);
-        object.position.set(0, 0, 0);
+      'model.pcd',
+      function (data) {
+        // Parse the .pcd file content
+        const points = parsePCD(data);
 
-        // Add the object to the scene
-        scene.add(object);
-      },
-      function (xhr) {
-        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-      },
-      function (error) {
-        console.error('An error occurred while loading the OBJ file');
+        // Create a geometry
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
+
+        // Create a material
+        const material = new THREE.PointsMaterial({ color: 0x00ff00, size: 0.01 });
+
+        // Create a point cloud using the geometry and material
+        const pointCloud = new THREE.Points(geometry, material);
+
+        // Add the point cloud to the scene
+        scene.add(pointCloud);
+
+        // Render the scene
+        function animate() {
+          requestAnimationFrame(animate);
+          renderer.render(scene, camera);
+        }
+        animate();
       }
     );
 
-    // Render the scene
-    function animate() {
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
+    // Function to parse the .pcd file data
+    function parsePCD(data) {
+      const lines = data.split('\n');
+      const points = [];
+
+      let start = false;
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].startsWith('DATA')) {
+          start = true;
+          continue;
+        }
+        if (start) {
+          const values = lines[i].split(' ');
+          const x = parseFloat(values[0]);
+          const y = parseFloat(values[1]);
+          const z = parseFloat(values[2]);
+          points.push(x, y, z);
+        }
+      }
+
+      return points;
     }
-    animate();
   </script>
 </body>
 </html>
