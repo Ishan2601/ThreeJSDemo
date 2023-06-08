@@ -23,6 +23,7 @@
 			import * as THREE from 'three';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
 			import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
 // 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -44,10 +45,11 @@
 				camera.position.set( 0, 0, 1 );
 				scene.add( camera );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+// 				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new TrackballControls(camera, renderer.domElement)
 				controls.addEventListener( 'change', render ); // use if there is no animation loop
-				controls.minDistance = 0.5;
-				controls.maxDistance = 100;
+// 				controls.minDistance = 0.5;
+// 				controls.maxDistance = 100;
 
 				scene.add( new THREE.AxesHelper( 100 ) );
 
