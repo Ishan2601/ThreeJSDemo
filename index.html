@@ -52,11 +52,11 @@
 				//scene.add( new THREE.AxesHelper( 1 ) );
 
 				const loader = new PCDLoader();
-				loader.load( 'output.pcd', function ( points ) {
+				loader.load( 'output_bin.pcd', function ( points ) {
 
 					points.geometry.center();
 					points.geometry.rotateX( Math.PI );
-					points.name = 'output.pcd';
+					points.name = 'output_bin.pcd';
 					scene.add( points );
 
 					//
